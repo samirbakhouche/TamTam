@@ -1,0 +1,8 @@
+{
+  "name": "TAMTAM",
+  "description": "Professional Android Messaging Application with real-time chat, media sharing, calls, and stories.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

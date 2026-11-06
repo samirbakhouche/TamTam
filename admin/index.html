@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم إدارة طمطم | TAMTAM Admin Console</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Cairo', 'Inter', sans-serif; }
+        .glass-panel { background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(16px); }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col">
+
+    <!-- Top Navigation Bar -->
+    <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-50 px-6 py-3.5 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-cyan-500 flex items-center justify-center font-black text-xl text-white shadow-lg shadow-blue-500/25">
+                ط
+            </div>
+            <div>
+                <h1 class="text-lg font-extrabold tracking-tight text-white flex items-center gap-2">
+                    بوابة إدارة طمطم <span class="text-[11px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full border border-blue-500/30 font-bold">Admin Console v1.0</span>
+                </h1>
+                <p class="text-xs text-slate-400">لوحة الإدارة والتحكم الشاملة في مستخدمي التطبيق وقاعدة البيانات</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-4">
+            <!-- Server Status Indicator -->
+            <div class="hidden sm:flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/30 px-3 py-1.5 rounded-xl text-emerald-400 text-xs font-semibold">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                <span>الخادم نشط • WebSockets &amp; MySQL Connected</span>
+            </div>
+
+            <!-- Language Switcher -->
+            <button onclick="toggleLanguage()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 font-bold border border-slate-700/60 transition">
+                🌐 English / العربية
+            </button>
+
+            <!-- Admin Profile Badge -->
+            <div class="flex items-center gap-2.5 border-r border-slate-800 pr-4">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 flex items-center justify-center text-xs font-black text-white shadow">
+                    AD
+                </div>
+                <div class="text-right hidden md:block">
+                    <div class="text-xs font-bold text-white">المدير التنفيذي</div>
+                    <div class="text-[10px] text-emerald-400">Super Admin</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex-1 flex max-w-[1600px] w-full mx-auto">
+        <!-- Sidebar Navigation -->
+        <aside class="w-64 border-l border-slate-800/80 bg-slate-900/50 p-4 space-y-2 hidden lg:block">
+            <div class="text-[11px] font-bold text-slate-400 px-3 py-2 uppercase tracking-wider">الأقسام الرئيسية</div>
+            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition bg-blue-600 text-white">
+                <span>📊</span> <span>لوحة الإحصائيات الحية</span>
+            </button>
+            <button onclick="switchTab('users')" id="nav-users" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition text-slate-300 hover:bg-slate-800/60">
+                <span>👥</span> <span>إدارة المستخدمين والحسابات</span>
+            </button>
+            <button onclick="switchTab('groups')" id="nav-groups" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition text-slate-300 hover:bg-slate-800/60">
+                <span>💬</span> <span>المجموعات والقنوات</span>
+            </button>
+            <button onclick="switchTab('reports')" id="nav-reports" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition text-slate-300 hover:bg-slate-800/60 flex justify-between">
+                <div class="flex items-center gap-3">
+                    <span>🛡️</span> <span>البلاغات والأمان</span>
+                </div>
+                <span class="bg-amber-500/20 text-amber-300 text-[10px] px-2 py-0.5 rounded-full font-bold">3 معلقة</span>
+            </button>
+
+            <div class="text-[11px] font-bold text-slate-400 px-3 pt-6 pb-2 uppercase tracking-wider">الاستضافة والتوثيق</div>
+            <button onclick="switchTab('hosting')" id="nav-hosting" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition text-slate-300 hover:bg-slate-800/60">
+                <span>🚀</span> <span>دليل الاستضافة المجانية</span>
+            </button>
+            <button onclick="switchTab('docs')" id="nav-docs" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition text-slate-300 hover:bg-slate-800/60">
+                <span>📖</span> <span>شرح معمارية التطبيق</span>
+            </button>
+            <button onclick="switchTab('settings')" id="nav-settings" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition text-slate-300 hover:bg-slate-800/60">
+                <span>⚙️</span> <span>إعدادات قاعدة البيانات</span>
+            </button>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 p-6 space-y-6 overflow-y-auto">
+
+            <!-- TAB 1: DASHBOARD -->
+            <div id="tab-dashboard" class="space-y-6">
+                <!-- KPI Statistics -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-slate-900 border border-slate-800/80 p-5 rounded-2xl relative overflow-hidden shadow">
+                        <div class="text-xs text-slate-400 font-bold mb-1">إجمالي المستخدمين المسجلين</div>
+                        <div class="text-3xl font-black text-white" id="statUsers">15,423</div>
+                        <div class="text-xs text-emerald-400 mt-2 font-semibold">↑ +14.2% نمو أسبوعي</div>
+                        <div class="absolute -left-2 -bottom-2 text-slate-800/30 text-7xl font-black select-none pointer-events-none">👥</div>
+                    </div>
+
+                    <div class="bg-slate-900 border border-slate-800/80 p-5 rounded-2xl relative overflow-hidden shadow">
+                        <div class="text-xs text-slate-400 font-bold mb-1">المستخدمون النشطون (24 ساعة)</div>
+                        <div class="text-3xl font-black text-blue-400" id="statActive">8,940</div>
+                        <div class="text-xs text-blue-300/80 mt-2 font-semibold">⚡ 58% نسبة التفاعل اللحظي</div>
+                        <div class="absolute -left-2 -bottom-2 text-slate-800/30 text-7xl font-black select-none pointer-events-none">🔥</div>
+                    </div>
+
+                    <div class="bg-slate-900 border border-slate-800/80 p-5 rounded-2xl relative overflow-hidden shadow">
+                        <div class="text-xs text-slate-400 font-bold mb-1">الرسائل المتبادلة في MySQL</div>
+                        <div class="text-3xl font-black text-white" id="statMessages">420,803</div>
+                        <div class="text-xs text-emerald-400 mt-2 font-semibold">↑ 48,210 رسالة اليوم</div>
+                        <div class="absolute -left-2 -bottom-2 text-slate-800/30 text-7xl font-black select-none pointer-events-none">💬</div>
+                    </div>
+
+                    <div class="bg-slate-900 border border-slate-800/80 p-5 rounded-2xl relative overflow-hidden shadow">
+                        <div class="text-xs text-slate-400 font-bold mb-1">استقرار وسرعة الخادم</div>
+                        <div class="text-3xl font-black text-emerald-400">99.98%</div>
+                        <div class="text-xs text-slate-400 mt-2 font-semibold">استجابة 18ms (WebSocket)</div>
+                        <div class="absolute -left-2 -bottom-2 text-slate-800/30 text-7xl font-black select-none pointer-events-none">⚡</div>
+                    </div>
+                </div>
+
+                <!-- Two Column Dashboard Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Users Quick Table -->
+                    <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4 shadow">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h2 class="text-base font-bold text-white">أحدث الحسابات المسجلة</h2>
+                                <p class="text-xs text-slate-400">مراقبة المستخدمين المسجلين عبر التطبيق والـ API</p>
+                            </div>
+                            <button onclick="switchTab('users')" class="text-xs text-blue-400 hover:text-blue-300 font-bold">عرض الكل ⭠</button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-right text-xs">
+                                <thead>
+                                    <tr class="text-slate-400 border-b border-slate-800 pb-2">
+                                        <th class="py-2.5">المستخدم</th>
+                                        <th class="py-2.5">الهاتف</th>
+                                        <th class="py-2.5">الحالة</th>
+                                        <th class="py-2.5 text-center">إجراءات</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-800/60" id="quickUsersBody">
+                                    <tr>
+                                        <td class="py-3 flex items-center gap-2.5">
+                                            <div class="w-8 h-8 rounded-full bg-blue-600/30 border border-blue-500/30 flex items-center justify-center font-bold text-blue-400">س</div>
+                                            <div>
+                                                <div class="font-bold text-white">سمير بخوش</div>
+                                                <div class="text-[10px] text-slate-400">@samir_dev</div>
+                                            </div>
+                                        </td>
+                                        <td class="py-3 text-slate-300 font-mono">+213550112233</td>
+                                        <td class="py-3"><span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-bold">نشط ومتصل</span></td>
+                                        <td class="py-3 text-center">
+                                            <button onclick="alert('تم إرسال تنبيه للمستخدم')" class="bg-slate-800 hover:bg-slate-700 px-2.5 py-1 rounded-lg text-slate-300 font-semibold text-[11px]">مراسلة</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-3 flex items-center gap-2.5">
+                                            <div class="w-8 h-8 rounded-full bg-purple-600/30 border border-purple-500/30 flex items-center justify-center font-bold text-purple-400">أ</div>
+                                            <div>
+                                                <div class="font-bold text-white">أميرة منصور</div>
+                                                <div class="text-[10px] text-slate-400">@amira_tech</div>
+                                            </div>
+                                        </td>
+                                        <td class="py-3 text-slate-300 font-mono">+213550445566</td>
+                                        <td class="py-3"><span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-bold">نشط</span></td>
+                                        <td class="py-3 text-center">
+                                            <button onclick="alert('تم إرسال تنبيه للمستخدم')" class="bg-slate-800 hover:bg-slate-700 px-2.5 py-1 rounded-lg text-slate-300 font-semibold text-[11px]">مراسلة</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Live Audit Feed -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4 shadow">
+                        <div class="flex items-center justify-between">
+                            <h2 class="text-base font-bold text-white">سجل العمليات المباشر (Audit Log)</h2>
+                            <span class="w-2.5 h-2.5 rounded-full bg-blue-500 animate-ping"></span>
+                        </div>
+                        <div class="space-y-2 text-xs font-mono" id="auditLog">
+                            <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-slate-300">
+                                <span class="text-blue-400 font-bold">[WS:HANDSHAKE]</span> عميل متصل (Client #u1 - Android App)
+                            </div>
+                            <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-slate-300">
+                                <span class="text-emerald-400 font-bold">[DB:MIGRATE]</span> تم فحص وتهيئة 19 جدولاً بنجاح
+                            </div>
+                            <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-slate-300">
+                                <span class="text-purple-400 font-bold">[AUTH:LOGIN]</span> تسجيل دخول للمستخدم @samir_dev
+                            </div>
+                            <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-slate-300">
+                                <span class="text-amber-400 font-bold">[MESSAGE:NEW]</span> تسليم رسالة مشفرة إلى المحادثة #1
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: USERS MANAGEMENT -->
+            <div id="tab-users" class="space-y-4 hidden">
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4 shadow">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div>
+                            <h2 class="text-lg font-bold text-white">إدارة المستخدمين والحسابات</h2>
+                            <p class="text-xs text-slate-400">البحث، تعليق الحسابات المخالفة، أو إعادة تفعيلها</p>
+                        </div>
+                        <input type="text" id="userSearch" onkeyup="filterUsers()" placeholder="ابحث باسم المستخدم أو رقم الهاتف..." class="bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-blue-500 w-full sm:w-72">
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-right text-xs" id="usersTable">
+                            <thead>
+                                <tr class="text-slate-400 border-b border-slate-800 pb-2 font-semibold">
+                                    <th class="py-3">معرّف ID</th>
+                                    <th class="py-3">الاسم واسم المستخدم</th>
+                                    <th class="py-3">الهاتف والبريد</th>
+                                    <th class="py-3">الحالة</th>
+                                    <th class="py-3">تاريخ التسجيل</th>
+                                    <th class="py-3 text-center">إجراءات الإدارة</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-800/60" id="usersFullList">
+                                <tr>
+                                    <td class="py-3 font-mono text-slate-400">#1</td>
+                                    <td class="py-3 font-bold text-white">سمير بخوش (@samir_dev)</td>
+                                    <td class="py-3 text-slate-300 font-mono">+213550112233<br><span class="text-slate-500 text-[10px]">samir@tamtam.dz</span></td>
+                                    <td class="py-3"><span id="userStatus1" class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold">نشط</span></td>
+                                    <td class="py-3 text-slate-400">2026-11-06</td>
+                                    <td class="py-3 text-center space-x-1.5 space-x-reverse">
+                                        <button onclick="toggleUserStatus(1)" id="btnStatus1" class="bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 px-3 py-1.5 rounded-lg border border-rose-500/30 font-semibold transition">تعليق الحساب</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 font-mono text-slate-400">#2</td>
+                                    <td class="py-3 font-bold text-white">أميرة منصور (@amira_tech)</td>
+                                    <td class="py-3 text-slate-300 font-mono">+213550445566<br><span class="text-slate-500 text-[10px]">amira@tamtam.dz</span></td>
+                                    <td class="py-3"><span id="userStatus2" class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold">نشط</span></td>
+                                    <td class="py-3 text-slate-400">2026-11-06</td>
+                                    <td class="py-3 text-center space-x-1.5 space-x-reverse">
+                                        <button onclick="toggleUserStatus(2)" id="btnStatus2" class="bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 px-3 py-1.5 rounded-lg border border-rose-500/30 font-semibold transition">تعليق الحساب</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: GROUPS -->
+            <div id="tab-groups" class="space-y-4 hidden">
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4 shadow">
+                    <h2 class="text-lg font-bold text-white">المجموعات والقنوات النشطة</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between">
+                            <div>
+                                <div class="font-bold text-white">فريق مطوري طمطم (TAMTAM Devs)</div>
+                                <div class="text-xs text-slate-400">254 عضو • 4 مشرفين • محادثات برمجية</div>
+                            </div>
+                            <span class="px-2 py-1 rounded bg-blue-500/20 text-blue-400 text-xs font-bold">عامة</span>
+                        </div>
+                        <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between">
+                            <div>
+                                <div class="font-bold text-white">قناة إعلانات طمطم الرسمية</div>
+                                <div class="text-xs text-slate-400">12,400 مشترك • إعلانات رسمية</div>
+                            </div>
+                            <span class="px-2 py-1 rounded bg-purple-500/20 text-purple-400 text-xs font-bold">قناة بث</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: REPORTS -->
+            <div id="tab-reports" class="space-y-4 hidden">
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4 shadow">
+                    <h2 class="text-lg font-bold text-white">بلاغات المحتوى والأمان (Content Moderation)</h2>
+                    <div class="space-y-3">
+                        <div class="p-4 rounded-xl bg-slate-950 border border-amber-500/30 flex items-center justify-between">
+                            <div>
+                                <div class="text-amber-400 font-bold text-xs flex items-center gap-2">
+                                    <span>⚠️ بلاغ إزعاج (Spam)</span>
+                                    <span class="text-slate-500 text-[10px]">منذ 15 دقيقة</span>
+                                </div>
+                                <div class="text-sm font-semibold text-white mt-1">إرسال روابط دعائية متكررة في المجموعات العامة</div>
+                                <div class="text-xs text-slate-400 mt-0.5">المبلغ عنه: @user_98210 • المُبلّغ: @karim_dz</div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button onclick="this.parentElement.parentElement.remove()" class="bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg text-xs font-bold">تجاهل</button>
+                                <button onclick="alert('تم حذف المحتوى وإنذار الحساب'); this.parentElement.parentElement.remove()" class="bg-amber-600 hover:bg-amber-500 px-3 py-1.5 rounded-lg text-xs font-bold text-white">حذف وتحذير</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 5: FREE HOSTING GUIDE -->
+            <div id="tab-hosting" class="space-y-6 hidden">
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-5 shadow">
+                    <div class="border-b border-slate-800 pb-4">
+                        <h2 class="text-xl font-extrabold text-white flex items-center gap-2">
+                            <span>🚀</span> <span>دليل نشر واستضافة خادم طمطم مجاناً 100%</span>
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-1">خطوات تشغيل الـ REST API وسيرفر الـ WebSockets وقاعدة بيانات MySQL مجاناً بالكامل</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Option 1: Render.com -->
+                        <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-3">
+                            <div class="flex items-center justify-between">
+                                <div class="font-black text-white text-base">1. استضافة الخادم على Render.com</div>
+                                <span class="bg-emerald-500/20 text-emerald-400 text-[10px] px-2 py-0.5 rounded font-bold">مجاني Free Tier</span>
+                            </div>
+                            <p class="text-xs text-slate-300 leading-relaxed">
+                                يدعم تشغيل كود Node.js مع بروتوكول WebSockets وشهادة حماية SSL/HTTPS مجانية مدى الحياة.
+                            </p>
+                            <div class="text-xs space-y-1 font-mono text-blue-400 bg-slate-900 p-3 rounded-lg border border-slate-800">
+                                <div>• المستودع: ارفع مجلد backend إلى GitHub</div>
+                                <div>• Build Command: <span class="text-white">npm install</span></div>
+                                <div>• Start Command: <span class="text-white">node src/server.js</span></div>
+                            </div>
+                        </div>
+
+                        <!-- Option 2: Free MySQL -->
+                        <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-3">
+                            <div class="flex items-center justify-between">
+                                <div class="font-black text-white text-base">2. استضافة MySQL مجانية (Aiven / TiDB)</div>
+                                <span class="bg-emerald-500/20 text-emerald-400 text-[10px] px-2 py-0.5 rounded font-bold">قاعدة بيانات سحابية</span>
+                            </div>
+                            <p class="text-xs text-slate-300 leading-relaxed">
+                                تمنحك منصة <strong>Aiven.io</strong> أو <strong>TiDB Cloud</strong> قاعدة بيانات MySQL سريعة مع 5GB مجاناً.
+                            </p>
+                            <div class="text-xs space-y-1 font-mono text-emerald-400 bg-slate-900 p-3 rounded-lg border border-slate-800">
+                                <div>• الصق كود الترحيل من: <span class="text-white">backend/database/migrations/core_schema.sql</span></div>
+                                <div>• انسخ رابط الاتصال في ملف <span class="text-white">.env</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Steps for Android App Connection -->
+                    <div class="p-5 rounded-2xl bg-blue-950/30 border border-blue-500/30 space-y-2">
+                        <div class="font-bold text-blue-300 text-sm">📲 ربط تطبيق الأندرويد بالخادم السحابي الجديد:</div>
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            بعد رفع الخادم والحصول على عنوان الرابط الخاص بك (مثلاً: <code class="bg-blue-900/40 text-blue-200 px-1.5 py-0.5 rounded">https://tamtam-api.onrender.com</code>):<br>
+                            1. افتح تطبيق طمطم على هاتفك ⭢ الإعدادات (Settings).<br>
+                            2. في خانة <strong>عنوان الخادم (Backend URL)</strong>، ضع رابط الخادم الجديد واضغط <strong>حفظ واختبار الاتصال</strong>.<br>
+                            3. سيتصل هاتفك فوراً بالسيرفر وقاعدة البيانات السحابية الحقيقية!
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 6: SYSTEM ARCHITECTURE DOCS -->
+            <div id="tab-docs" class="space-y-6 hidden">
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-5 shadow">
+                    <h2 class="text-xl font-extrabold text-white">📖 شرح المعمارية والهندسة البرمجية لتطبيق طمطم</h2>
+                    <div class="space-y-4 text-xs text-slate-300 leading-relaxed">
+                        <div class="p-4 rounded-xl bg-slate-950 border border-slate-800">
+                            <h3 class="font-bold text-white text-sm mb-1">1. تطبيق الأندرويد (Android Client)</h3>
+                            <p>مبني وفق معمارية <strong>Clean Architecture + MVVM</strong>، باستخدام Jetpack Compose بالكامل، مع دعم كامل للغة العربية والاتجاه من اليمين لليسار (RTL). يعتمد قاعدة بيانات <strong>Room</strong> لتخزين المحادثات والرسائل محلياً ليعمل التطبيق بسرعة فائقة ودون انقطاع (Offline-First).</p>
+                        </div>
+                        <div class="p-4 rounded-xl bg-slate-950 border border-slate-800">
+                            <h3 class="font-bold text-white text-sm mb-1">2. الخادم ومحرك التراسل اللحظي (Backend &amp; WebSockets)</h3>
+                            <p>خادم مبني بلغة Node.js/Express، يحتوي على بوابات REST API للمصادقة وتحديث الحسابات، ومزود بمحرك <strong>WebSockets</strong> للتواصل المباشر وتسليم الرسائل ومؤشرات الكتابة وحالة الاتصال فورياً بـ 0 تأخير.</p>
+                        </div>
+                        <div class="p-4 rounded-xl bg-slate-950 border border-slate-800">
+                            <h3 class="font-bold text-white text-sm mb-1">3. قاعدة البيانات العلائقية (MySQL Schema)</h3>
+                            <p>تضم 19 جدولاً مترابطاً مع مفاتيح أجنبية وفهارس مركبة وفهرسة نصية كاملة (Fulltext Search) على محتوى الرسائل للبحث السريع، مع مشغلات (Triggers) لتحديث آخر رسالة تلقائياً.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 7: SETTINGS -->
+            <div id="tab-settings" class="space-y-4 hidden">
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4 shadow max-w-2xl">
+                    <h2 class="text-lg font-bold text-white">إعدادات الخادم وقاعدة البيانات</h2>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 mb-1">مفتاح تشفير الجلسات (JWT Secret)</label>
+                            <input type="text" value="tamtam_super_secure_jwt_secret_key_2026" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-xs font-mono text-slate-300">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 mb-1">منفذ الويب والـ WebSockets</label>
+                            <input type="number" value="5000" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-xs font-mono text-slate-300">
+                        </div>
+                        <button onclick="alert('تم حفظ إعدادات النظام بنجاح!')" class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2 rounded-xl text-xs font-bold">حفظ الإعدادات</button>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        function switchTab(tabName) {
+            const tabs = ['dashboard', 'users', 'groups', 'reports', 'hosting', 'docs', 'settings'];
+            tabs.forEach(t => {
+                const el = document.getElementById('tab-' + t);
+                const btn = document.getElementById('nav-' + t);
+                if (el) el.classList.add('hidden');
+                if (btn) {
+                    btn.classList.remove('bg-blue-600', 'text-white');
+                    btn.classList.add('text-slate-300');
+                }
+            });
+
+            const activeTab = document.getElementById('tab-' + tabName);
+            const activeBtn = document.getElementById('nav-' + tabName);
+            if (activeTab) activeTab.classList.remove('hidden');
+            if (activeBtn) {
+                activeBtn.classList.add('bg-blue-600', 'text-white');
+                activeBtn.classList.remove('text-slate-300');
+            }
+        }
+
+        function toggleUserStatus(id) {
+            const statusBadge = document.getElementById('userStatus' + id);
+            const btn = document.getElementById('btnStatus' + id);
+            if (statusBadge.innerText === 'نشط') {
+                statusBadge.innerText = 'معلق';
+                statusBadge.className = 'px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/30 text-[10px] font-bold';
+                btn.innerText = 'إعادة تفعيل';
+                btn.className = 'bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 px-3 py-1.5 rounded-lg border border-emerald-500/30 font-semibold transition';
+            } else {
+                statusBadge.innerText = 'نشط';
+                statusBadge.className = 'px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold';
+                btn.innerText = 'تعليق الحساب';
+                btn.className = 'bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 px-3 py-1.5 rounded-lg border border-rose-500/30 font-semibold transition';
+            }
+        }
+
+        function filterUsers() {
+            const input = document.getElementById('userSearch').value.toLowerCase();
+            const rows = document.getElementById('usersFullList').getElementsByTagName('tr');
+            for (let i = 0; i < rows.length; i++) {
+                const text = rows[i].innerText.toLowerCase();
+                rows[i].style.display = text.includes(input) ? '' : 'none';
+            }
+        }
+
+        function toggleLanguage() {
+            const isRtl = document.documentElement.dir === 'rtl';
+            document.documentElement.dir = isRtl ? 'ltr' : 'rtl';
+            document.documentElement.lang = isRtl ? 'en' : 'ar';
+        }
+    </script>
+</body>
+</html>
